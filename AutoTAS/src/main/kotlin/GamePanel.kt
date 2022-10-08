@@ -1,6 +1,8 @@
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 import kotlin.math.hypot
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 class GamePanel(var state: State) : Canvas() {
 
@@ -9,6 +11,8 @@ class GamePanel(var state: State) : Canvas() {
     var cameraZoom: Int = 50000
     var manualInput = Input(false, false, false)
     var timesDied: Int = 0
+    var waypoint: Waypoint? = null
+    var saveState: State? = null
 
     fun paint() {
         // get drawing context
@@ -53,22 +57,62 @@ class GamePanel(var state: State) : Canvas() {
             (state.playerY + State.playerRadius) * ymul + yadd,
             State.playerRadius * 2 * xmul,
             -State.playerRadius * 2 * ymul)
+        // show waypoint
+        var waypoint = waypoint;
+        if(waypoint != null) {
+            gc.stroke = Color.GREEN
+            gc.strokeLine(
+                (waypoint.x - State.playerRadius) * xmul + xadd,
+                waypoint.y * ymul + yadd,
+                (waypoint.x + State.playerRadius) * xmul + xadd,
+                waypoint.y * ymul + yadd)
+            gc.strokeLine(waypoint.x * xmul + xadd,
+                (waypoint.y - State.playerRadius) * ymul + yadd,
+                waypoint.x * xmul + xadd,
+                (waypoint.y + State.playerRadius) * ymul + yadd)
+            gc.strokeOval(
+                (waypoint.x - State.playerRadius) * xmul + xadd,
+                (waypoint.y + State.playerRadius) * ymul + yadd,
+                State.playerRadius * 2 * xmul,
+                -State.playerRadius * 2 * ymul)
+        }
         // frame counter
         gc.fillText(state.frame.toString(), 10.0, 10.0)
         gc.fillText("$timesDied deaths", 10.0, 40.0)
     }
 
-    fun getInput(): Input {
-        return manualInput
+    fun setWaypointByPixel(x: Double, y: Double) {
+        val cwidth = width
+        val cheight = height
+        // figure out camera transform
+        val xmul = hypot(cwidth, cheight) / cameraZoom
+        val ymul = -xmul
+        val xadd = cwidth * 0.5 - cameraX * xmul
+        val yadd = cheight * 0.5 - cameraY * ymul
+        // create waypoint
+        waypoint = Waypoint(((x - xadd) / xmul).roundToInt(), ((y - yadd) / ymul).roundToInt())
+    }
+
+    fun getInput(): Input? {
+        if(waypoint == null) {
+            return manualInput
+        }
+        return null
     }
 
     fun tick() {
-        state = state.copy()
-        val died = state.tickInPlace(getInput())
-        if(died) {
-            timesDied++
-            state.playerX = state.world.spawnX
-            state.playerY = state.world.spawnY
+        if(saveState == null) {
+            saveState = state
+        }
+        var input = getInput()
+        if(input != null) {
+            state = state.copy()
+            val died = state.tickInPlace(input)
+            val restore = saveState
+            if(died && restore != null) {
+                timesDied++
+                state = restore
+            }
         }
         paint()
     }

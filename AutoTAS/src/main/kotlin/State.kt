@@ -5,6 +5,7 @@ class State(
     var playerVX: Int,
     var playerVY: Int,
     var world: World,
+    var hash: StateHash = StateHash(0, 0),
     var grounded: Boolean = false
 ) {
 
@@ -19,7 +20,7 @@ class State(
     }
 
     fun copy(): State {
-        return State(frame, playerX, playerY, playerVX, playerVY, world, grounded)
+        return State(frame, playerX, playerY, playerVX, playerVY, world, hash, grounded)
     }
 
     fun tickInPlace(input: Input): Boolean {
@@ -110,6 +111,7 @@ class State(
             }
         }
         playerY = targetY
+        hash = hash.append(input)
         return false
     }
 

@@ -36,21 +36,26 @@ class Main : Application() {
         // key listener
         gamePanel.onKeyPressed = EventHandler {
             if(it.code == KeyCode.A) {
-                gamePanel.manualInput.left = true;
+                gamePanel.manualInput.left = true
             }else if(it.code == KeyCode.D) {
-                gamePanel.manualInput.right = true;
+                gamePanel.manualInput.right = true
             }else if(it.code == KeyCode.J) {
-                gamePanel.manualInput.jump = true;
+                gamePanel.manualInput.jump = true
+            }else if(it.code == KeyCode.H) {
+                gamePanel.waypoint = null
             }
         }
         gamePanel.onKeyReleased = EventHandler {
             if(it.code == KeyCode.A) {
-                gamePanel.manualInput.left = false;
+                gamePanel.manualInput.left = false
             }else if(it.code == KeyCode.D) {
-                gamePanel.manualInput.right = false;
+                gamePanel.manualInput.right = false
             }else if(it.code == KeyCode.J) {
-                gamePanel.manualInput.jump = false;
+                gamePanel.manualInput.jump = false
             }
+        }
+        gamePanel.onMouseClicked = EventHandler {
+            gamePanel.setWaypointByPixel(it.x, it.y)
         }
         gamePanel.requestFocus()
         // begin ticking
