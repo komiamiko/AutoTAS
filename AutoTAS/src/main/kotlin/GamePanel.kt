@@ -4,10 +4,11 @@ import kotlin.math.hypot
 
 class GamePanel(var state: State) : Canvas() {
 
-    var cameraX: Int = 0
-    var cameraY: Int = 0
+    var cameraX: Int = 1024 * 15
+    var cameraY: Int = 1024 * 2
     var cameraZoom: Int = 50000
     var manualInput = Input(false, false, false)
+    var timesDied: Int = 0
 
     fun paint() {
         // get drawing context
@@ -24,7 +25,7 @@ class GamePanel(var state: State) : Canvas() {
         val xadd = cwidth * 0.5 - cameraX * xmul
         val yadd = cheight * 0.5 - cameraY * ymul
         // show surfaces
-        gc.lineWidth = 1.0
+        gc.lineWidth = 3.0
         for(surface in state.world.surfacesUp) {
             gc.stroke = if(surface.spike) Color.RED else Color.BLACK
             val y = surface.y * ymul + yadd
@@ -54,6 +55,7 @@ class GamePanel(var state: State) : Canvas() {
             -State.playerRadius * 2 * ymul)
         // frame counter
         gc.fillText(state.frame.toString(), 10.0, 10.0)
+        gc.fillText("$timesDied deaths", 10.0, 40.0)
     }
 
     fun getInput(): Input {
@@ -62,7 +64,12 @@ class GamePanel(var state: State) : Canvas() {
 
     fun tick() {
         state = state.copy()
-        state.tickInPlace(getInput())
+        val died = state.tickInPlace(getInput())
+        if(died) {
+            timesDied++
+            state.playerX = state.world.spawnX
+            state.playerY = state.world.spawnY
+        }
         paint()
     }
 

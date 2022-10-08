@@ -11,11 +11,11 @@ class State(
     companion object {
         val tileSize: Int = 1024
         val playerRadius: Int = 448
-        val hvMove: Int = 16
-        val hvSoftcap: Int = 50
-        val hvLinearDrag: Int = 2
-        val gravity: Int = 5
-        val jump: Int = 154
+        val hvMove: Int = 39
+        val hvSoftcap: Int = 155
+        val hvLinearDrag: Int = 9
+        val gravity: Int = 16
+        val jump: Int = 308
     }
 
     fun copy(): State {
@@ -48,8 +48,8 @@ class State(
         if(playerVX <= 0) {
             // moving left
             for(surface in world.surfacesRight) {
-                if(playerY + playerRadius >= surface.x1
-                    && playerY - playerRadius <= surface.x2
+                if(playerY + playerRadius > surface.x1
+                    && playerY - playerRadius < surface.x2
                     && playerX - playerRadius >= surface.y
                     && targetX - playerRadius <= surface.y) {
                     if(surface.spike) {
@@ -63,8 +63,8 @@ class State(
         if(playerVX >= 0) {
             // moving right
             for(surface in world.surfacesLeft) {
-                if(playerY + playerRadius >= surface.x1
-                    && playerY - playerRadius <= surface.x2
+                if(playerY + playerRadius > surface.x1
+                    && playerY - playerRadius < surface.x2
                     && playerX + playerRadius <= surface.y
                     && targetX + playerRadius >= surface.y) {
                     if(surface.spike) {
@@ -81,8 +81,8 @@ class State(
         if(playerVY <= 0) {
             // moving down
             for(surface in world.surfacesUp) {
-                if(playerX + playerRadius >= surface.x1
-                    && playerX - playerRadius <= surface.x2
+                if(playerX + playerRadius > surface.x1
+                    && playerX - playerRadius < surface.x2
                     && playerY - playerRadius >= surface.y
                     && targetY - playerRadius <= surface.y) {
                     if(surface.spike) {
@@ -97,8 +97,8 @@ class State(
         if(playerVY >= 0) {
             // moving up
             for(surface in world.surfacesDown) {
-                if(playerX + playerRadius >= surface.x1
-                    && playerX - playerRadius <= surface.x2
+                if(playerX + playerRadius > surface.x1
+                    && playerX - playerRadius < surface.x2
                     && playerY + playerRadius <= surface.y
                     && targetY + playerRadius >= surface.y) {
                     if(surface.spike) {
